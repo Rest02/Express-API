@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 
 const app = express();
-const products = [
+let products = [
   {
     id: 1,
     name: "laptop",
@@ -23,24 +23,54 @@ app.post("/products", (req, res) => {
   res.send(newProduct);
 });
 
-app.put("/products", (req, res) => {
-  res.send("Actualizando Productos");
-});
-
-app.delete("/products", (req, res) => {
-  res.send("Borrando Productos");
-});
-
-app.get("/products/:id", (req, res) => {
-  console.log(req.params.id);
+app.put("/products/:id", (req, res) => {
+  const newData = req.body;
   const productFind = products.find(function (product) {
     return product.id === parseInt(req.params.id);
   });
 
-  if(!productFind){
+  if (!productFind) {
     return res.status(404).json({
-      mesagge : "Product not found"
-    })
+      mesagge: "Product not found",
+    });
+  }
+
+  products = products.map((p) =>
+    p.id === parseInt(req.params.id) ? { ...p, ...newData } : p
+  );
+
+  console.log(newProducts);
+
+  res.json({
+    mesagge: "Product sussesfull",
+  });
+});
+
+app.delete("/products/:id", (req, res) => {
+  const productFind = products.find(function (product) {
+    return product.id === parseInt(req.params.id);
+  });
+
+  if (!productFind) {
+    return res.status(404).json({
+      mesagge: "Product not found",
+    });
+  }
+
+  products = products.filter((p) => p.id !== parseInt(req.params.id));
+
+  res.sendStatus(204);
+});
+
+app.get("/products/:id", (req, res) => {
+  const productFind = products.find(function (product) {
+    return product.id === parseInt(req.params.id);
+  });
+
+  if (!productFind) {
+    return res.status(404).json({
+      mesagge: "Product not found",
+    });
   }
 
   res.json(productFind);
